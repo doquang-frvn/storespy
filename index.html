@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StoreSpy – Instant eCommerce Intelligence</title>
+<meta name="description" content="Detect Shopify & WooCommerce stores in one click. Reveal themes, apps, Facebook & TikTok pixels, products, and more. Free Chrome extension by Clingogo.">
+<meta property="og:title" content="StoreSpy – Instant eCommerce Intelligence">
+<meta property="og:description" content="One click reveals the tech stack behind any online store. Theme, apps, pixels, products, social links and more.">
+<meta property="og:image" content="https://clingogo.com/storespy/og.png">
+<link rel="canonical" href="https://clingogo.com/storespy">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080a10;
+  --bg2: #0f1118;
+  --surface: #13161f;
+  --surface2: #1a1e2a;
+  --border: #1f2538;
+  --accent: #5b8df6;
+  --accent2: #a78bfa;
+  --green: #34d399;
+  --yellow: #fbbf24;
+  --text: #edf0f8;
+  --text2: #8892aa;
+  --shopify: #96bf48;
+  --woo: #9b72cf;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+
+/* ── GRID UTILS ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(8,10,16,0.85); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+}
+.nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+.nav-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.nav-links { display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--text2); }
+.nav-links a:hover { color: var(--text); }
+.nav-cta { background: var(--accent); color: white; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: opacity .15s; }
+.nav-cta:hover { opacity: .88; }
+
+/* ── HERO ── */
+.hero {
+  padding: 140px 24px 80px;
+  text-align: center;
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(91,141,246,0.12), transparent);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--accent); border: 1px solid rgba(91,141,246,.25);
+  background: rgba(91,141,246,.06); padding: 5px 14px; border-radius: 20px; margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 68px);
+  font-weight: 800; letter-spacing: -2px; line-height: 1.05;
+  margin-bottom: 20px;
+}
+.hero h1 .grad {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, var(--green) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--text2); max-width: 560px; margin: 0 auto 36px;
+  line-height: 1.65;
+}
+.hero-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: white;
+  padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700;
+  transition: all .2s; box-shadow: 0 0 40px rgba(91,141,246,.25);
+}
+.btn-primary:hover { opacity: .9; transform: translateY(-1px); box-shadow: 0 4px 50px rgba(91,141,246,.35); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--text2); border: 1px solid var(--border);
+  padding: 13px 24px; border-radius: 10px; font-size: 15px;
+  transition: all .2s;
+}
+.btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,.2); background: var(--surface); }
+.hero-note { margin-top: 16px; font-size: 13px; color: var(--text2); }
+.hero-note span { color: var(--green); }
+
+/* ── POPUP PREVIEW ── */
+.preview-wrap {
+  margin: 64px auto 0;
+  max-width: 800px;
+  position: relative;
+}
+.preview-glow {
+  position: absolute; inset: -40px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(91,141,246,.15), transparent 70%);
+  pointer-events: none;
+}
+.browser-mock {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6);
+}
+.browser-bar {
+  background: var(--surface2); padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.browser-dots { display: flex; gap: 5px; }
+.browser-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.browser-dots span:nth-child(1) { background: #ff5f57; }
+.browser-dots span:nth-child(2) { background: #febc2e; }
+.browser-dots span:nth-child(3) { background: #28c840; }
+.browser-url { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; font-size: 12px; color: var(--text2); }
+
+/* Popup mock inside browser */
+.popup-mock {
+  width: 360px; position: absolute; right: 20px; top: 48px;
+  background: #0d0f14; border: 1px solid #252c3a;
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.8);
+  font-size: 13px;
+}
+.pm-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 10px; border-bottom: 1px solid #252c3a; }
+.pm-logo { display: flex; align-items: center; gap: 7px; }
+.pm-logo-icon { width: 24px; height: 24px; background: linear-gradient(135deg, #5b8df6,#a78bfa); border-radius: 6px; display:flex;align-items:center;justify-content:center;font-size:12px; }
+.pm-logo-name { font-weight: 700; font-size: 13px; background: linear-gradient(90deg,#5b8df6,#a78bfa); -webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+.pm-nav { display: flex; border-bottom: 1px solid #252c3a; }
+.pm-nav-tab { flex: 1; padding: 7px 0; font-size: 10px; text-align: center; color: #6b7a99; border-bottom: 2px solid transparent; }
+.pm-nav-tab.active { color: #5b8df6; border-bottom-color: #5b8df6; font-weight: 600; }
+.pm-banner { display: flex; align-items: center; gap: 8px; margin: 8px 10px 6px; padding: 8px 10px; background: linear-gradient(135deg,rgba(150,191,72,.1),rgba(150,191,72,.03)); border: 1px solid rgba(150,191,72,.2); border-radius: 7px; }
+.pm-platform { font-size: 20px; }
+.pm-pname { font-size: 14px; font-weight: 700; }
+.pm-pdomain { font-size: 10px; color: #6b7a99; }
+.pm-live { font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 8px; background: rgba(150,191,72,.12); color: #96bf48; border: 1px solid rgba(150,191,72,.25); }
+.pm-section { margin: 0 10px 6px; background: #161a22; border: 1px solid #252c3a; border-radius: 7px; }
+.pm-sec-head { padding: 5px 10px; font-size: 9px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: #6b7a99; border-bottom: 1px solid #252c3a; background: #1e2330; }
+.pm-row { display: flex; align-items: center; padding: 5px 10px; border-bottom: 1px solid #252c3a; gap: 6px; }
+.pm-row:last-child { border-bottom: none; }
+.pm-rl { font-size: 10px; color: #6b7a99; width: 56px; }
+.pm-rv { font-size: 11px; color: #e2e8f4; font-weight: 500; }
+.pm-px-row { padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
+.pm-px-item { display: flex; align-items: center; gap: 5px; }
+.pm-px-badge { font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
+.pm-px-badge.fb { background: rgba(24,119,242,.1); color: #60a5fa; border: 1px solid rgba(24,119,242,.2); }
+.pm-px-badge.tt { background: rgba(255,255,255,.05); color: #eee; border: 1px solid rgba(255,255,255,.1); }
+.pm-px-badge.ga { background: rgba(251,191,36,.1); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+.pm-px-id { font-size: 10px; font-family: monospace; color: #9aa3b8; }
+.pm-copy { font-size: 9px; color: #6b7a99; padding: 1px 5px; border: 1px solid #252c3a; border-radius: 3px; margin-left: auto; cursor: pointer; }
+.pm-footer { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; border-top: 1px solid #252c3a; }
+.pm-brand { font-size: 10px; color: #6b7a99; }
+.pm-btn { background: #5b8df6; color: white; border: none; border-radius: 5px; padding: 3px 10px; font-size: 10px; font-weight: 600; cursor: pointer; }
+
+/* Website mockup in browser */
+.site-mock { padding: 20px; min-height: 280px; background: #f8f8f6; position: relative; }
+.site-header-bar { background: white; height: 50px; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; padding: 0 14px; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.site-logo-block { width: 80px; height: 20px; background: #1a1a1a; border-radius: 3px; }
+.site-nav-items { display: flex; gap: 8px; }
+.site-nav-item { width: 40px; height: 8px; background: #ddd; border-radius: 2px; }
+.site-hero-banner { background: linear-gradient(135deg,#1a1a1a,#333); height: 120px; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.site-hero-text { }
+.site-hero-h { width: 120px; height: 14px; background: white; border-radius: 3px; margin-bottom: 6px; opacity: .9; }
+.site-hero-sub { width: 80px; height: 8px; background: rgba(255,255,255,.5); border-radius: 2px; }
+.site-products { display: flex; gap: 8px; }
+.site-product { flex: 1; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.site-product-img { height: 60px; background: linear-gradient(135deg, #e8e4f0, #d4e8f0); }
+.site-product-info { padding: 6px 8px; }
+.site-product-title { width: 60px; height: 7px; background: #333; border-radius: 2px; margin-bottom: 4px; }
+.site-product-price { width: 36px; height: 7px; background: #5b8df6; border-radius: 2px; }
+
+/* ── STATS BAR ── */
+.stats-bar {
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 32px 24px;
+  background: var(--surface);
+}
+.stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+.stat-num { font-size: 36px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-label { font-size: 14px; color: var(--text2); margin-top: 2px; }
+
+/* ── FEATURES ── */
+.features { padding: 100px 24px; }
+.section-label { font-size: 12px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; line-height: 1.1; }
+.section-sub { font-size: 18px; color: var(--text2); max-width: 520px; line-height: 1.65; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 64px; }
+.feat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px;
+  transition: border-color .2s, transform .2s;
+}
+.feat-card:hover { border-color: rgba(91,141,246,.35); transform: translateY(-2px); }
+.feat-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
+.feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.feat-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.feat-tag { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 8px; }
+.feat-tag.free { background: rgba(52,211,153,.1); color: var(--green); }
+.feat-tag.pro { background: rgba(91,141,246,.1); color: var(--accent); }
+
+/* ── HOW IT WORKS ── */
+.how { padding: 80px 24px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; margin-top: 56px; position: relative; }
+.steps::before { content:''; position:absolute; top:24px; left:17%; right:17%; height:1px; background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent); }
+.step { text-align: center; }
+.step-num { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; margin: 0 auto 16px; color: white; position: relative; z-index: 1; box-shadow: 0 0 20px rgba(91,141,246,.3); }
+.step-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.step-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+/* ── WHAT WE DETECT ── */
+.detect-section { padding: 100px 24px; }
+.detect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 64px; }
+.detect-list { display: flex; flex-direction: column; gap: 12px; }
+.detect-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; transition: border-color .2s; }
+.detect-item:hover { border-color: rgba(91,141,246,.3); }
+.detect-ico { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.detect-info { }
+.detect-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.detect-desc { font-size: 13px; color: var(--text2); }
+
+/* ── PRICING ── */
+.pricing { padding: 100px 24px; background: var(--surface); border-top: 1px solid var(--border); }
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 64px; max-width: 900px; margin-left: auto; margin-right: auto; }
+.price-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 24px;
+}
+.price-card.featured {
+  border: 2px solid var(--accent);
+  background: linear-gradient(160deg, rgba(91,141,246,.05), var(--bg));
+  position: relative;
+}
+.price-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 20px; white-space: nowrap; }
+.price-name { font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+.price-amount { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; }
+.price-amount sup { font-size: 20px; font-weight: 700; vertical-align: top; margin-top: 6px; display: inline-block; }
+.price-per { font-size: 13px; color: var(--text2); margin-top: 4px; margin-bottom: 20px; }
+.price-divider { height: 1px; background: var(--border); margin: 20px 0; }
+.price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.price-features li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text2); }
+.price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+.price-features li.muted { color: #444; }
+.price-features li.muted::before { content: '—'; color: #333; }
+.price-btn { display: block; text-align: center; margin-top: 24px; padding: 12px; border-radius: 9px; font-size: 15px; font-weight: 700; transition: all .2s; }
+.price-btn.outline { border: 1px solid var(--border); color: var(--text2); }
+.price-btn.outline:hover { border-color: rgba(255,255,255,.2); color: var(--text); background: var(--surface); }
+.price-btn.filled { background: var(--accent); color: white; }
+.price-btn.filled:hover { opacity: .9; transform: translateY(-1px); }
+
+/* ── PLATFORM BADGES ── */
+.platforms { padding: 56px 24px; text-align: center; border-top: 1px solid var(--border); }
+.platforms p { font-size: 13px; color: var(--text2); margin-bottom: 20px; text-transform: uppercase; letter-spacing: .8px; font-weight: 600; }
+.platform-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.platform-badge { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; background: var(--surface); }
+
+/* ── FAQ ── */
+.faq { padding: 100px 24px; }
+.faq-list { max-width: 680px; margin: 56px auto 0; display: flex; flex-direction: column; gap: 8px; }
+.faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.faq-q { padding: 16px 20px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-q::after { content: '+'; font-size: 20px; color: var(--text2); transition: transform .2s; }
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a { padding: 0 20px; max-height: 0; overflow: hidden; font-size: 14px; color: var(--text2); line-height: 1.7; transition: max-height .3s, padding .3s; }
+.faq-item.open .faq-a { max-height: 200px; padding: 0 20px 16px; }
+
+/* ── CTA BOTTOM ── */
+.cta-bottom {
+  padding: 100px 24px; text-align: center;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(91,141,246,.1), transparent);
+  border-top: 1px solid var(--border);
+}
+.cta-bottom h2 { font-size: clamp(28px, 4vw, 48px); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; }
+.cta-bottom p { font-size: 18px; color: var(--text2); margin-bottom: 36px; }
+
+/* ── FOOTER ── */
+footer { padding: 40px 24px; border-top: 1px solid var(--border); }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.footer-left { display: flex; align-items: center; gap: 10px; }
+.footer-links { display: flex; gap: 20px; font-size: 13px; color: var(--text2); }
+.footer-links a:hover { color: var(--text); }
+.footer-copy { font-size: 13px; color: var(--text2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .steps::before { display: none; }
+  .detect-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .popup-mock { display: none; }
+  .preview-wrap { max-width: 100%; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">🔍</div>
+      <span>StoreSpy</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://clingogo.com" target="_blank">By Clingogo</a>
+    </div>
+    <a class="nav-cta" href="https://chrome.google.com/webstore/detail/storespy" target="_blank">
+      Add to Chrome — Free
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">⚡ Chrome Extension · Free to install</div>
+    <h1>
+      X-ray any<br>
+      <span class="grad">online store</span><br>
+      in one click
+    </h1>
+    <p class="hero-sub">
+      Instantly reveal the theme, apps, Facebook & TikTok pixel IDs, top products, social links, and tech stack behind any Shopify or WooCommerce store.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://chrome.google.com/webstore/detail/storespy" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add to Chrome — Free
+      </a>
+      <a class="btn-secondary" href="#features">See what it detects →</a>
+    </div>
+    <p class="hero-note">Free forever · <span>Pro from $4.99/mo</span> · No account needed</p>
+
+    <!-- BROWSER + POPUP MOCK -->
+    <div class="preview-wrap">
+      <div class="preview-glow"></div>
+      <div class="browser-mock">
+        <div class="browser-bar">
+          <div class="browser-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="browser-url">🔒 dingmun.com</div>
+          <div style="display:flex;gap:6px;margin-left:8px">
+            <div style="width:22px;height:22px;background:var(--surface);border-radius:4px;border:1px solid var(--border)"></div>
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#5b8df6,#a78bfa);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px">🔍</div>
+          </div>
+        </div>
+        <div style="position:relative">
+          <!-- Website content -->
+          <div class="site-mock">
+            <div class="site-header-bar">
+              <div class="site-logo-block"></div>
+              <div class="site-nav-items">
+                <div class="site-nav-item"></div>
+                <div class="site-nav-item"></div>
+                <div class="site-nav-item"></div>
+                <div class="site-nav-item"></div>
+              </div>
+            </div>
+            <div class="site-hero-banner">
+              <div class="site-hero-text">
+                <div class="site-hero-h"></div>
+                <div class="site-hero-sub"></div>
+              </div>
+            </div>
+            <div class="site-products">
+              <div class="site-product"><div class="site-product-img"></div><div class="site-product-info"><div class="site-product-title"></div><div class="site-product-price"></div></div></div>
+              <div class="site-product"><div class="site-product-img" style="background:linear-gradient(135deg,#f0e8d4,#e8d4d4)"></div><div class="site-product-info"><div class="site-product-title"></div><div class="site-product-price"></div></div></div>
+              <div class="site-product"><div class="site-product-img" style="background:linear-gradient(135deg,#d4e8d4,#d4d4e8)"></div><div class="site-product-info"><div class="site-product-title"></div><div class="site-product-price"></div></div></div>
+            </div>
+          </div>
+
+          <!-- StoreSpy popup overlay -->
+          <div class="popup-mock">
+            <div class="pm-header">
+              <div class="pm-logo">
+                <div class="pm-logo-icon">🔍</div>
+                <div class="pm-logo-name">StoreSpy</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(91,141,246,.12);color:#5b8df6;border:1px solid rgba(91,141,246,.25);font-weight:600">⬇ CSV</span>
+                <span style="font-size:10px;color:#6b7a99">v2.1</span>
+              </div>
+            </div>
+            <div class="pm-nav">
+              <div class="pm-nav-tab active">Overview</div>
+              <div class="pm-nav-tab">Pixels</div>
+              <div class="pm-nav-tab">Apps</div>
+              <div class="pm-nav-tab">Products</div>
+              <div class="pm-nav-tab">History</div>
+            </div>
+            <div class="pm-banner">
+              <div class="pm-platform">🛒</div>
+              <div>
+                <div class="pm-pname">WooCommerce</div>
+                <div class="pm-pdomain">dingmun.com</div>
+              </div>
+              <div class="pm-live">LIVE</div>
+            </div>
+            <div class="pm-section">
+              <div class="pm-sec-head">📋 Store Info</div>
+              <div class="pm-row"><div class="pm-rl">Theme</div><div class="pm-rv">Simple</div></div>
+              <div class="pm-row"><div class="pm-rl">Currency</div><div class="pm-rv">USD</div></div>
+              <div class="pm-row"><div class="pm-rl">Language</div><div class="pm-rv">en-US</div></div>
+              <div class="pm-row"><div class="pm-rl">Products</div><div class="pm-rv">847 products</div></div>
+              <div class="pm-row"><div class="pm-rl">Email</div><div class="pm-rv" style="color:#5b8df6">info@dingmun.com</div></div>
+            </div>
+            <div class="pm-section">
+              <div class="pm-sec-head">📡 Tracking</div>
+              <div class="pm-px-row">
+                <div class="pm-px-item">
+                  <span class="pm-px-badge fb">📘 FB Pixel</span>
+                  <span class="pm-px-id">1234567890123456</span>
+                  <span class="pm-copy">Copy</span>
+                </div>
+                <div class="pm-px-item">
+                  <span class="pm-px-badge ga">📊 GA4</span>
+                  <span class="pm-px-id">G-ABCD123456</span>
+                  <span class="pm-copy">Copy</span>
+                </div>
+                <div class="pm-px-item">
+                  <span class="pm-px-badge tt">🎵 TikTok</span>
+                  <span class="pm-px-id">CDEFGH12345678901</span>
+                  <span class="pm-copy">Copy</span>
+                </div>
+              </div>
+            </div>
+            <div class="pm-footer">
+              <span class="pm-brand">by <span style="color:#5b8df6">Clingogo</span></span>
+              <button class="pm-btn">↻ Rescan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div><div class="stat-num">202+</div><div class="stat-label">Apps detected</div></div>
+    <div><div class="stat-num">35+</div><div class="stat-label">Themes identified</div></div>
+    <div><div class="stat-num">6</div><div class="stat-label">Pixel platforms</div></div>
+    <div><div class="stat-num">2</div><div class="stat-label">eCommerce platforms</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything about a store,<br>revealed instantly</h2>
+    <p class="section-sub">No sign-up. No API keys. Just click the extension on any eCommerce store.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(150,191,72,.1)">🛍️</div>
+        <div class="feat-title">Platform Detection</div>
+        <div class="feat-desc">Identifies Shopify, WooCommerce, BigCommerce, Squarespace, Webflow and headless stores instantly.</div>
+        <span class="feat-tag free">Free</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(24,119,242,.1)">📡</div>
+        <div class="feat-title">Full Pixel IDs + Copy</div>
+        <div class="feat-desc">Captures Facebook, TikTok, GA4, GTM, MS Clarity, Snapchat, and Pinterest pixel IDs with one-click copy.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(91,141,246,.1)">🔌</div>
+        <div class="feat-title">202+ App Fingerprints</div>
+        <div class="feat-desc">Detects Klaviyo, Loox, ReCharge, Printful, DSers, Gorgias, PageFly, and 196 more apps across 18 categories.</div>
+        <span class="feat-tag free">Free</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(251,191,36,.1)">🛒</div>
+        <div class="feat-title">Top Products</div>
+        <div class="feat-desc">Fetches the store's public product catalog via Shopify's JSON API. See bestsellers with images, prices, and variants.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(52,211,153,.1)">📚</div>
+        <div class="feat-title">Store History & Changes</div>
+        <div class="feat-desc">Saves your last 50 scans locally. Returns to a store? See exactly which apps were added or removed since your last visit.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(167,139,250,.1)">⚡</div>
+        <div class="feat-title">Page Speed + SEO</div>
+        <div class="feat-desc">Load time, script count, third-party scripts, lazy loading, missing meta tags, canonical, and OG image — all at a glance.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(248,113,113,.1)">🎨</div>
+        <div class="feat-title">Brand Colors & Fonts</div>
+        <div class="feat-desc">Extracts CSS color tokens and Google Fonts in use. See the store's visual identity with clickable color swatches.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(52,211,153,.1)">📧</div>
+        <div class="feat-title">Contact & Social Links</div>
+        <div class="feat-desc">Extracts contact email and detects Instagram, Facebook, TikTok, Twitter, YouTube, and Pinterest profiles.</div>
+        <span class="feat-tag free">Free</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:rgba(91,141,246,.1)">⬇️</div>
+        <div class="feat-title">Export to CSV</div>
+        <div class="feat-desc">Download all detected data as a clean CSV — platform, theme, all pixel IDs, apps, email, payments, speed, and more.</div>
+        <span class="feat-tag pro">Pro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container" style="text-align:center">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Three steps, zero friction</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Install for free</div>
+        <div class="step-desc">One click from the Chrome Web Store. No account, no API keys, no permissions beyond the active tab.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Visit any store</div>
+        <div class="step-desc">Navigate to any Shopify or WooCommerce store. StoreSpy quietly hooks into the page in the background.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Click the icon</div>
+        <div class="step-desc">The popup opens with full intelligence: platform, theme, pixel IDs, apps, products, speed score, and more.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE DETECT -->
+<section class="detect-section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start">
+      <div>
+        <div class="section-label">Detection coverage</div>
+        <h2 class="section-title">What StoreSpy reveals</h2>
+        <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-top:12px">Unlike tools that only detect the platform, StoreSpy gives you the full intelligence picture — pixel IDs you can actually use, app stack, and store vitals.</p>
+      </div>
+      <div class="detect-list">
+        <div class="detect-item">
+          <div class="detect-ico">🛍️</div>
+          <div><div class="detect-name">Platform + Theme</div><div class="detect-desc">Shopify, WooCommerce, BigCommerce, Squarespace, Webflow + exact theme name</div></div>
+        </div>
+        <div class="detect-item">
+          <div class="detect-ico">📘</div>
+          <div><div class="detect-name">Facebook Pixel ID</div><div class="detect-desc">Full 16-digit pixel ID via early-hook injection — catches GTM-loaded pixels too</div></div>
+        </div>
+        <div class="detect-item">
+          <div class="detect-ico">🎵</div>
+          <div><div class="detect-name">TikTok, GA4, GTM IDs</div><div class="detect-desc">All tracking IDs with one-click copy to clipboard</div></div>
+        </div>
+        <div class="detect-item">
+          <div class="detect-ico">🔌</div>
+          <div><div class="detect-name">202+ Apps</div><div class="detect-desc">Email, reviews, upsell, loyalty, subscriptions, POD, dropshipping, GDPR and more</div></div>
+        </div>
+        <div class="detect-item">
+          <div class="detect-ico">🛒</div>
+          <div><div class="detect-name">Products & Payments</div><div class="detect-desc">Top products via Shopify API + PayPal, Stripe, Klarna, Afterpay detection</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<div class="platforms">
+  <p>Works on all major platforms</p>
+  <div class="platform-badges">
+    <div class="platform-badge" style="border-color:rgba(150,191,72,.3)">🛍️ <span style="color:var(--shopify)">Shopify</span></div>
+    <div class="platform-badge" style="border-color:rgba(155,114,207,.3)">🛒 <span style="color:var(--woo)">WooCommerce</span></div>
+    <div class="platform-badge">🏪 BigCommerce</div>
+    <div class="platform-badge">⬜ Squarespace</div>
+    <div class="platform-badge">💎 Webflow</div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container" style="text-align:center">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Start free, upgrade when you need more</h2>
+    <p style="font-size:17px;color:var(--text2);margin-top:8px">No credit card required to start.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div class="price-amount">$0</div>
+        <div class="price-per">forever</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>Platform detection</li>
+          <li>Theme name</li>
+          <li>202+ app detection</li>
+          <li>Contact email</li>
+          <li>Social links</li>
+          <li>Basic traffic tier</li>
+          <li class="muted">Pixel IDs</li>
+          <li class="muted">Product list</li>
+          <li class="muted">CSV export</li>
+          <li class="muted">Store history</li>
+        </ul>
+        <a class="price-btn outline" href="https://chrome.google.com/webstore/detail/storespy" target="_blank">Install Free</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-popular">Most Popular</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount"><sup>$</sup>4.99</div>
+        <div class="price-per">per month · cancel anytime</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>Everything in Free</li>
+          <li>Full Pixel IDs + Copy</li>
+          <li>Top 12 products</li>
+          <li>Export to CSV</li>
+          <li>Store history (50 stores)</li>
+          <li>Change detection</li>
+          <li>Page speed score</li>
+          <li>Brand colors & fonts</li>
+          <li>Payment methods</li>
+        </ul>
+        <a class="price-btn filled" href="https://buy.polar.sh/storespy-pro" target="_blank">Get Pro →</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Agency</div>
+        <div class="price-amount"><sup>$</sup>14.99</div>
+        <div class="price-per">per month</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>Unlimited history</li>
+          <li>Watchlist & alerts</li>
+          <li>Bulk CSV export</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="price-btn outline" href="https://buy.polar.sh/storespy-agency" target="_blank">Get Agency →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container" style="text-align:center">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Common questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Does it work on all Shopify stores?</div>
+        <div class="faq-a">StoreSpy works on the vast majority of Shopify stores. A small number of stores using heavily customized headless setups may return partial data. Product listing requires that the store hasn't disabled the public <code>/products.json</code> endpoint.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can store owners tell I'm analyzing their store?</div>
+        <div class="faq-a">No. StoreSpy only reads publicly visible data that any visitor sees in their browser. It makes no server-side requests to the store's admin and leaves no trace.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why is Facebook Pixel ID sometimes missing?</div>
+        <div class="faq-a">StoreSpy v2.1 uses an early-injection hook that runs before any page script, so it captures pixel IDs loaded via GTM or third-party apps. If the ID is still missing, the store likely loads it server-side or encrypts it. This is rare (&lt;5% of stores).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How does the Pro plan work?</div>
+        <div class="faq-a">Pro is a monthly subscription via Polar.sh. After subscribing, you receive a license key. Enter it once in the extension settings to unlock all Pro features. Cancel anytime from your Polar dashboard.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my browsing data stored anywhere?</div>
+        <div class="faq-a">No. All scan data is stored locally in your browser using <code>chrome.storage.local</code>. StoreSpy does not transmit any browsing data to external servers. The only network requests are to verify your Pro license key.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BOTTOM -->
+<section class="cta-bottom">
+  <div class="container">
+    <h2>Start spying smarter</h2>
+    <p>Free forever. Upgrade to Pro when you need pixel IDs, products, and export.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://chrome.google.com/webstore/detail/storespy" target="_blank">
+        Add to Chrome — Free
+      </a>
+      <a class="btn-secondary" href="https://buy.polar.sh/storespy-pro" target="_blank">Get Pro $4.99/mo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="nav-logo-icon" style="width:28px;height:28px;background:linear-gradient(135deg,#5b8df6,#a78bfa);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px">🔍</div>
+      <span style="font-weight:700;font-size:15px">StoreSpy</span>
+    </div>
+    <div class="footer-links">
+      <a href="/storespy/privacy.html">Privacy Policy</a>
+      <a href="/storespy/terms.html">Terms of Service</a>
+      <a href="https://clingogo.com" target="_blank">Clingogo</a>
+    </div>
+    <div class="footer-copy">© 2025 Clingogo. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>

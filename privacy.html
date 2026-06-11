@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy – StoreSpy</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg:#080a10;--surface:#13161f;--border:#1f2538;--accent:#5b8df6;--text:#edf0f8;--text2:#8892aa;--font:'Inter',system-ui,sans-serif; }
+body { background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.7; }
+.container { max-width:720px;margin:0 auto;padding:80px 24px 100px; }
+.back { display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);margin-bottom:40px;text-decoration:none; }
+.back:hover { color:var(--text); }
+h1 { font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px; }
+.meta { font-size:14px;color:var(--text2);margin-bottom:48px;padding-bottom:24px;border-bottom:1px solid var(--border); }
+h2 { font-size:20px;font-weight:700;margin:36px 0 12px;color:var(--text); }
+p { color:var(--text2);margin-bottom:14px; }
+ul { color:var(--text2);padding-left:20px;margin-bottom:14px; }
+ul li { margin-bottom:6px; }
+strong { color:var(--text); }
+a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="/storespy/">← Back to StoreSpy</a>
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last updated: June 2025 · StoreSpy Chrome Extension by Clingogo</div>
+
+  <h2>1. Overview</h2>
+  <p>StoreSpy ("we", "our", "the extension") is a Chrome browser extension that analyzes publicly visible data on eCommerce websites. We are committed to protecting your privacy. This policy explains what data is collected, how it is used, and your rights.</p>
+
+  <h2>2. Data We Do NOT Collect</h2>
+  <p><strong>StoreSpy does not collect, transmit, or store any of the following:</strong></p>
+  <ul>
+    <li>Your browsing history or visited URLs</li>
+    <li>Any personal information about you</li>
+    <li>Scan results or store data from websites you visit</li>
+    <li>Credentials, passwords, or payment information</li>
+    <li>Any analytics about your usage of the extension</li>
+  </ul>
+
+  <h2>3. Data Stored Locally</h2>
+  <p>StoreSpy uses <code>chrome.storage.local</code> to store the following data <strong>exclusively on your device</strong>:</p>
+  <ul>
+    <li><strong>Scan history</strong> — The last 50 stores you scanned (hostname, platform, theme, app list, scan date). This never leaves your device.</li>
+    <li><strong>Pro license key</strong> — If you subscribe to StoreSpy Pro, your Polar.sh license key is stored locally to verify your subscription status.</li>
+    <li><strong>Settings</strong> — Any preferences you configure within the extension.</li>
+  </ul>
+  <p>You can delete all locally stored data at any time by clicking "Clear history" in the History tab, or by removing the extension from Chrome.</p>
+
+  <h2>4. Network Requests</h2>
+  <p>The extension makes the following outbound requests:</p>
+  <ul>
+    <li><strong>License verification</strong> — Pro subscribers: a request to <code>api.polar.sh</code> to verify your license key. No browsing data is included in this request.</li>
+    <li><strong>Shopify products API</strong> — For Shopify stores, the extension fetches <code>/products.json</code> from the current store's domain (a public endpoint). This is the same request any browser would make when visiting that page.</li>
+  </ul>
+  <p>No data is sent to Clingogo servers. No analytics SDKs are included in the extension.</p>
+
+  <h2>5. Permissions Explained</h2>
+  <ul>
+    <li><strong>activeTab</strong> — Required to read the currently open tab's URL and inject the scanning script.</li>
+    <li><strong>scripting</strong> — Required to execute the store analysis script on the active page.</li>
+    <li><strong>storage</strong> — Required to save scan history and license key locally on your device.</li>
+    <li><strong>host_permissions (&lt;all_urls&gt;)</strong> — Required to inject the pixel-hook script at <code>document_start</code> on any website, so pixel IDs are captured before async scripts load. This does not enable data collection — the injected script only stores data locally.</li>
+  </ul>
+
+  <h2>6. Third-Party Services</h2>
+  <p>StoreSpy Pro uses <strong>Polar.sh</strong> as its payment processor and license manager. When you purchase a subscription, Polar.sh's privacy policy applies to your payment data. StoreSpy does not receive or store your payment information.</p>
+
+  <h2>7. Children's Privacy</h2>
+  <p>StoreSpy is not directed at children under 13. We do not knowingly collect any information from children.</p>
+
+  <h2>8. Changes to This Policy</h2>
+  <p>We may update this policy as the extension evolves. Material changes will be noted in the Chrome Web Store update description. The "Last updated" date at the top of this page reflects the most recent version.</p>
+
+  <h2>9. Contact</h2>
+  <p>Questions about this privacy policy? Contact us at <a href="mailto:support@clingogo.com">support@clingogo.com</a> or visit <a href="https://clingogo.com">clingogo.com</a>.</p>
+</div>
+</body>
+</html>
