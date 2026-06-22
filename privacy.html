@@ -25,57 +25,106 @@ a { color:var(--accent); }
 <div class="container">
   <a class="back" href="/storespy/">← Back to StoreSpy</a>
   <h1>Privacy Policy</h1>
-  <div class="meta">Last updated: June 2025 · StoreSpy Chrome Extension by Clingogo</div>
+  <div class="meta">Effective date: June 2026 · StoreSpy Chrome Extension by Clingogo</div>
 
-  <h2>1. Overview</h2>
-  <p>StoreSpy ("we", "our", "the extension") is a Chrome browser extension that analyzes publicly visible data on eCommerce websites. We are committed to protecting your privacy. This policy explains what data is collected, how it is used, and your rights.</p>
+  <p>StoreSpy is a Chrome extension that helps users analyze publicly visible eCommerce store signals directly in their browser. This Privacy Policy explains what information StoreSpy processes, how it is used, how it is stored, and what is shared outside the browser.</p>
 
-  <h2>2. Data We Do NOT Collect</h2>
-  <p><strong>StoreSpy does not collect, transmit, or store any of the following:</strong></p>
+  <h2>1. Information StoreSpy Processes</h2>
+  <p>StoreSpy may process the following information when you use the extension:</p>
+
+  <p><strong>Publicly visible page data</strong></p>
+  <p>When you open the extension on an eCommerce website, StoreSpy analyzes publicly visible page data in your browser, such as:</p>
   <ul>
-    <li>Your browsing history or visited URLs</li>
-    <li>Any personal information about you</li>
-    <li>Scan results or store data from websites you visit</li>
-    <li>Credentials, passwords, or payment information</li>
-    <li>Any analytics about your usage of the extension</li>
+    <li>Page HTML and metadata</li>
+    <li>Public scripts and resource URLs</li>
+    <li>Public store platform signals</li>
+    <li>Theme and app signals</li>
+    <li>Public tracking and analytics signals</li>
+    <li>Public product data where available</li>
+    <li>Contact links, social links, and payment method signals</li>
+  </ul>
+  <p>StoreSpy does not access private account pages, admin dashboards, passwords, payment card details, checkout information, or private customer data.</p>
+
+  <p><strong>Scan history and watchlist data</strong></p>
+  <p>StoreSpy may store scan results locally in your browser, including:</p>
+  <ul>
+    <li>Store domain</li>
+    <li>Detected platform</li>
+    <li>Detected app and theme signals</li>
+    <li>Public tracking signals</li>
+    <li>Public product signals where available</li>
+    <li>Scan timestamps</li>
+    <li>Change history between scans</li>
+    <li>Watchlist entries selected by the user</li>
+  </ul>
+  <p>This information is used to provide store history, watchlist, CSV export, and change tracking features.</p>
+
+  <p><strong>License and account activation data</strong></p>
+  <p>If you activate StoreSpy Pro, the extension may process your email address to verify your license or subscription status.</p>
+
+  <h2>2. How StoreSpy Uses Information</h2>
+  <p>StoreSpy uses the information above only to provide the extension's core functionality, including:</p>
+  <ul>
+    <li>Detecting public eCommerce store signals</li>
+    <li>Showing platform, app, theme, product, payment, and tracking information</li>
+    <li>Saving local scan history</li>
+    <li>Comparing changes between scans</li>
+    <li>Managing a local watchlist</li>
+    <li>Exporting scan data to CSV</li>
+    <li>Verifying Pro license status</li>
+  </ul>
+  <p>StoreSpy does not use this information for advertising, profiling, creditworthiness, or unrelated purposes.</p>
+
+  <h2>3. Local Storage</h2>
+  <p>Most StoreSpy data is stored locally in your browser using Chrome local storage.</p>
+  <p>This includes scan history, watchlist data, settings, and license status. This data remains on your device unless you remove the extension, clear browser storage, or delete the data inside the extension.</p>
+
+  <h2>4. External Requests</h2>
+  <p>StoreSpy does not send scan history, browsing history, page content, or detected store data to StoreSpy servers.</p>
+  <p>The only external request made by StoreSpy's own service is for Pro license verification when you activate Pro. This may include your email address and license status request.</p>
+  <p>StoreSpy may also observe publicly loaded network requests in the browser in order to detect public tracking and analytics signals visible on the current page. This is used only for the extension's detection functionality.</p>
+
+  <h2>5. Data Sharing</h2>
+  <p>StoreSpy does not sell, rent, or transfer user data to third parties.</p>
+  <p>StoreSpy does not share browsing history, scan results, page content, or watchlist data with third parties.</p>
+  <p>License verification may be handled through a payment or subscription service provider only for the purpose of confirming Pro access.</p>
+
+  <h2>6. Data Retention</h2>
+  <p>Local scan history, watchlist data, settings, and license status remain stored in your browser until you delete them, clear browser storage, or uninstall the extension.</p>
+  <p>StoreSpy does not maintain a server-side database of your scan history or watchlist data.</p>
+
+  <h2>7. User Control</h2>
+  <p>You can remove locally stored StoreSpy data by:</p>
+  <ul>
+    <li>Clearing extension storage in Chrome</li>
+    <li>Removing the extension</li>
+    <li>Clearing browser site and extension data</li>
+    <li>Using the "Clear history" option inside the extension's History tab</li>
   </ul>
 
-  <h2>3. Data Stored Locally</h2>
-  <p>StoreSpy uses <code>chrome.storage.local</code> to store the following data <strong>exclusively on your device</strong>:</p>
+  <h2>8. Permissions Explained</h2>
   <ul>
-    <li><strong>Scan history</strong> — The last 50 stores you scanned (hostname, platform, theme, app list, scan date). This never leaves your device.</li>
-    <li><strong>Pro license key</strong> — If you subscribe to StoreSpy Pro, your Polar.sh license key is stored locally to verify your subscription status.</li>
-    <li><strong>Settings</strong> — Any preferences you configure within the extension.</li>
-  </ul>
-  <p>You can delete all locally stored data at any time by clicking "Clear history" in the History tab, or by removing the extension from Chrome.</p>
-
-  <h2>4. Network Requests</h2>
-  <p>The extension makes the following outbound requests:</p>
-  <ul>
-    <li><strong>License verification</strong> — Pro subscribers: a request to <code>api.polar.sh</code> to verify your license key. No browsing data is included in this request.</li>
-    <li><strong>Shopify products API</strong> — For Shopify stores, the extension fetches <code>/products.json</code> from the current store's domain (a public endpoint). This is the same request any browser would make when visiting that page.</li>
-  </ul>
-  <p>No data is sent to Clingogo servers. No analytics SDKs are included in the extension.</p>
-
-  <h2>5. Permissions Explained</h2>
-  <ul>
-    <li><strong>activeTab</strong> — Required to read the currently open tab's URL and inject the scanning script.</li>
+    <li><strong>activeTab</strong> — Required to read the currently open tab's URL and run the scanning script.</li>
     <li><strong>scripting</strong> — Required to execute the store analysis script on the active page.</li>
-    <li><strong>storage</strong> — Required to save scan history and license key locally on your device.</li>
-    <li><strong>host_permissions (&lt;all_urls&gt;)</strong> — Required to inject the pixel-hook script at <code>document_start</code> on any website, so pixel IDs are captured before async scripts load. This does not enable data collection — the injected script only stores data locally.</li>
+    <li><strong>storage</strong> — Required to save scan history, watchlist, and license status locally on your device.</li>
+    <li><strong>host_permissions (&lt;all_urls&gt;)</strong> — Required to analyze publicly visible page signals on websites where the user uses StoreSpy. This allows StoreSpy to detect store platforms, app signals, public tracking signals, and changes between scans. Scan results are stored locally in the user's browser and are not sent to StoreSpy servers.</li>
+    <li><strong>webRequest</strong> — Required to detect publicly loaded tracking and analytics requests visible in the browser. This is used only to identify public tracking signals for the current scan.</li>
   </ul>
 
-  <h2>6. Third-Party Services</h2>
-  <p>StoreSpy Pro uses <strong>Polar.sh</strong> as its payment processor and license manager. When you purchase a subscription, Polar.sh's privacy policy applies to your payment data. StoreSpy does not receive or store your payment information.</p>
+  <h2>9. Third-Party Services</h2>
+  <p>StoreSpy Pro uses <strong>Polar.sh</strong> as its payment processor and subscription manager. When you purchase a subscription, Polar.sh's privacy policy applies to your payment data. StoreSpy does not receive or store your payment card information.</p>
 
-  <h2>7. Children's Privacy</h2>
+  <h2>10. Security</h2>
+  <p>StoreSpy is designed to process store analysis data locally in your browser where possible. StoreSpy does not access passwords, payment information, private account data, or admin-only content.</p>
+
+  <h2>11. Children's Privacy</h2>
   <p>StoreSpy is not directed at children under 13. We do not knowingly collect any information from children.</p>
 
-  <h2>8. Changes to This Policy</h2>
-  <p>We may update this policy as the extension evolves. Material changes will be noted in the Chrome Web Store update description. The "Last updated" date at the top of this page reflects the most recent version.</p>
+  <h2>12. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated effective date.</p>
 
-  <h2>9. Contact</h2>
-  <p>Questions about this privacy policy? Contact us at <a href="mailto:support@clingogo.com">support@clingogo.com</a> or visit <a href="https://clingogo.com">clingogo.com</a>.</p>
+  <h2>13. Contact</h2>
+  <p>If you have questions about this Privacy Policy, contact us at <a href="mailto:support@clingogo.com">support@clingogo.com</a>.</p>
 </div>
 </body>
 </html>
